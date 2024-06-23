@@ -35,6 +35,3 @@ plt.gca().invert_yaxis()
 
 # Guardar la gráfica en un archivo
 plt.savefig('Clientes_que_Menos_Pedidos_Realizan_a_la_Semana.png')
-
-# Mostrar la gráfica
-plt.show()
