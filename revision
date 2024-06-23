@@ -8,13 +8,25 @@ df = pd.read_excel(file_path, engine='openpyxl')
 # Mostrar las primeras filas del dataframe para entender su estructura
 print(df.head())
 
+# Verificar el nombre de las columnas
+print("Columnas disponibles:", df.columns)
+
 # Asegúrate de que el nombre de la columna coincide exactamente
 # Supongamos que la columna se llama 'Fecha del Pedido' según el resultado del print anterior
-df['Fecha del Pedido'] = pd.to_datetime(df['Fecha del Pedido'])
+df['Fecha del Pedido'] = pd.to_datetime(df['Fecha del Pedido'], errors='coerce')
+
+# Verificar si hay valores nulos después de la conversión a datetime
+print("Valores nulos en 'Fecha del Pedido':", df['Fecha del Pedido'].isnull().sum())
+
+# Eliminar filas con valores nulos en 'Fecha del Pedido'
+df = df.dropna(subset=['Fecha del Pedido'])
 
 # Contar el número de pedidos por cliente por semana
 df['Semana'] = df['Fecha del Pedido'].dt.isocalendar().week
 pedidos_por_semana = df.groupby(['Cliente', 'Semana']).size().reset_index(name='Pedidos')
+
+# Verificar los datos agrupados
+print(pedidos_por_semana.head())
 
 # Sumar los pedidos por cliente
 total_pedidos_por_cliente = pedidos_por_semana.groupby('Cliente')['Pedidos'].sum().reset_index()
@@ -24,6 +36,9 @@ total_pedidos_por_cliente = total_pedidos_por_cliente.sort_values(by='Pedidos')
 
 # Seleccionar los 10 clientes que menos pedidos realizan
 top_10_menos_pedidos = total_pedidos_por_cliente.head(10)
+
+# Verificar los datos seleccionados para la gráfica
+print(top_10_menos_pedidos)
 
 # Graficar
 plt.figure(figsize=(10, 6))
@@ -35,3 +50,6 @@ plt.gca().invert_yaxis()
 
 # Guardar la gráfica en un archivo
 plt.savefig('Clientes_que_Menos_Pedidos_Realizan_a_la_Semana.png')
+
+# Mostrar la gráfica
+plt.show()
