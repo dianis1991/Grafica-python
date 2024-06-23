@@ -1,0 +1,45 @@
+>>> import pandas as pd
+>>> import matplotlib.pyplot as plt
+>>>
+>>> # Usar barras invertidas dobles en la ruta del archivo
+>>> file_path = 'D:\\Downloads\\Pedidos supermercados Madrid.xlsx'
+>>> df = pd.read_excel(file_path, engine='openpyxl')
+>>>
+>>> # Continuar con el análisis de datos y la generación de gráficos
+>>> print(df.head())
+   Cliente  Ruta    Cajas      Kilos  Estibas  DISTANCE Fecha del Pedido
+0    19819  7302  1512,88  16782,713  17,9472      1792       2023-07-01
+1   200277  7201    11,25    112,442   0,1311      1709       2023-07-02
+2    19819  7302   1845,5   18657,24  20,1966      1792       2023-07-02
+3       43  7201       25     35,225   0,0385      1709       2023-07-02
+4    10352  7201       10        196   0,2382      1709       2023-07-02
+>>>
+>>> # Convertir la columna de fechas a datetime
+>>> df['Fecha del Pedido'] = pd.to_datetime(df['Fecha del Pedido'])
+>>>
+>>> # Contar el número de pedidos por cliente por semana
+>>> df['Semana'] = df['Fecha del Pedido'].dt.isocalendar().week
+>>> pedidos_por_semana = df.groupby(['Cliente', 'Semana']).size().reset_index(name='Pedidos')
+>>>
+>>> # Sumar los pedidos por cliente
+>>> total_pedidos_por_cliente = pedidos_por_semana.groupby('Cliente')['Pedidos'].sum().reset_index()
+>>>
+>>> # Ordenar por el número total de pedidos en orden ascendente (menos pedidos primero)
+>>> total_pedidos_por_cliente = total_pedidos_por_cliente.sort_values(by='Pedidos')
+>>>
+>>> # Seleccionar los 10 clientes que menos pedidos realizan
+>>> top_10_menos_pedidos = total_pedidos_por_cliente.head(10)
+>>>
+>>> # Graficar
+>>> plt.figure(figsize=(10, 6))
+<Figure size 1000x600 with 0 Axes>
+>>> plt.barh(top_10_menos_pedidos['Cliente'], top_10_menos_pedidos['Pedidos'], color='skyblue')
+<BarContainer object of 10 artists>
+>>> plt.xlabel('Número de Pedidos')
+Text(0.5, 0, 'Número de Pedidos')
+>>> plt.ylabel('Cliente')
+Text(0, 0.5, 'Cliente')
+>>> plt.title('Clientes que Menos Pedidos Realizan a la Semana')
+Text(0.5, 1.0, 'Clientes que Menos Pedidos Realizan a la Semana')
+>>> plt.gca().invert_yaxis()
+>>> plt.show()
